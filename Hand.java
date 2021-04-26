@@ -14,7 +14,7 @@ public class Hand {
   // prints out name of each card in hand
   public void getHand() {
     for (int i = 0; i < this.getHandSize(); i++){
-      System.out.println(this.hand.get(i).getName());
+      System.out.println("  " + this.hand.get(i).getName());
     } // end for
   } // end getHand()
 
@@ -41,6 +41,18 @@ public class Hand {
     return this.hand.size();
   } // end getHandSize()
 
+  // gets frequency of whatever card's suit is being passed
+  public int getSuitFrequency(Card card) {
+    String cardSuit = card.getSuit();
+    ArrayList<String> handSuits = new ArrayList<String>();
+    for (int i = 0; i < this.hand.size(); i++) {
+      Card currentCard = this.hand.get(i);
+      handSuits.add(currentCard.getSuit());
+    }
+    int frequency = Collections.frequency(handSuits, cardSuit);
+    return frequency;
+  } // end getSuitFrequency()
+
   /*
   get a random card in the deck
   add that card to hand
@@ -56,6 +68,18 @@ public class Hand {
       deck.removeCard(randNum);
     } // end for
   } // end dealHand()
+
+  // bubble sort
+  // puts card with rank of lowest number (1 being the lowest possible) at front of ArrayList
+  public void sortHand() {
+    for (int i = 0; i < (this.hand.size() - 1); i++) {
+      for (int j = 0; j < (this.hand.size() - 1); j++) {
+        if (this.hand.get(j).getRank() > (this.hand.get(j + 1).getRank())) {
+          Collections.swap(this.hand, j, j + 1);
+        } // end swap if
+      } // end j for
+    } // end i for
+  } // end sortHand()
 
   // tests Hand class
   public static void main(String[] args) {
@@ -84,7 +108,12 @@ public class Hand {
     System.out.println();
 
     // should print out 5 cards still
-    System.out.println("p2 hand:");
+    System.out.println("p2 hand before sort:");
+    p2.getHand();
+    System.out.println();
+
+    System.out.println("p2 hand after sort:");
+    p2.sortHand();
     p2.getHand();
   } // end public static void main(String[] args)
 } // end Hand.java

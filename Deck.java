@@ -3,12 +3,13 @@
 import java.util.*;
 
 public class Deck {
-  protected static ArrayList<Card> deck= new ArrayList<>();
+  protected static ArrayList<Card> deck = new ArrayList<>();
   protected String[] suits = {"Hearts", "Diamonds", "Clubs", "Spades"};
 
+  // constructor
   public Deck() {
     this.setDeck();
-  } // end constructor
+  }
 
   public void setDeck() {
     this.deck.clear();
@@ -51,6 +52,8 @@ public class Deck {
   // tests Deck class
   public static void main(String[] args) {
     Deck deck = new Deck();
+
+    deck.setDeck();
 
     // prints deck
     for (int i = 0; i < 24; i++) {

@@ -3,38 +3,50 @@
 import java.util.*;
 
 public class Player extends TeamMember {
-  private Hand hand;
-  private boolean dealer;
-  private boolean alone;
 
-  public Player(Deck deck) {
+  public Player(){}
+
+  public Player(Deck deck, String name) {
     this.hand = new Hand();
     this.hand.dealHand(deck);
+    this.hand.sortHand();
     this.dealer = false;
     this.alone = false;
+    this.name = name;
   } // end constructor
 
-  public void setDealer(boolean dealer) {
-    this.dealer = dealer;
-  } // end setDealer()
+  // ???
+  public void getPlayerHand() {
+    this.hand.getHand();
+  }
 
-  public boolean getDealer() {
-    return this.dealer;
-  } // end getDealer()
+  public String order(Card turnedUp) {
+    boolean keepGoing = true;
+    String decision = "p";
+    while (keepGoing) {
+      System.out.println("Will you pass or order up?");
+      System.out.print("p or o: ");
+      Scanner input = new Scanner(System.in);
+      String response = input.nextLine();
+      //String decision;
+      if (response.equals("p")) {
+        keepGoing = false;
+        decision = "p";
+      } else if (response.equals("o")) {
+        keepGoing = false;
+        decision = "o";
+      } else {
+        System.out.println("Please enter a valid response.");
+      } // end if
+    } // end while
+    return decision;
+  } // end order()
 
-  public void setAlone(boolean alone) {
-    this.alone = alone;
-  } // end setAlone()
-
-  public boolean getAlone() {
-    return this.alone;
-  } // end getAlone()
-
-  // tests Player class 
+  // tests Player class
   public static void main(String[] args) {
     Deck deck = new Deck();
-    Player p1 = new Player(deck);
-    Player p2 = new Player(deck);
+    Player p1 = new Player(deck, "p1");
+    Player p2 = new Player(deck, "p2");
 
     System.out.println("P1:");
     p1.hand.getHand();
@@ -55,6 +67,5 @@ public class Player extends TeamMember {
     p2.setAlone(true);
     System.out.println("Alone after setAlone(true): " + p2.getAlone());
     System.out.println();
-    //p2.hand.getHand();
   } // end public static void main(String[] args)
 } // end Player.java
