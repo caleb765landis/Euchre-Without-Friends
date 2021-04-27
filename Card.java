@@ -8,12 +8,14 @@ public class Card {
   protected int rank;
   protected boolean trump;
 
+  // takes in suit and rank as parameters from setDeck()
   public Card(String suit, int rank) {
     this.suit = suit;
     this.rank = rank;
     this.trump = false;
   } // end constructor
 
+  // sets name of card based on its rank and suit 
   public void initName() {
     if (rank == 3) {
       this.name = "Ace of " + this.getSuit();

@@ -1,5 +1,5 @@
 // TeamMember.java
-// interface to be extended by Player.java
+// abstract class to be extended by Player.java and AI.java 
 
 import java.util.*;
 
@@ -13,6 +13,7 @@ public abstract class TeamMember {
   // constructor
   public TeamMember(){}
 
+  // prints out name of each card in hand with options for user to select card
   public void getPlayerHand() {
     for (int i = 0; i < this.hand.getHandSize(); i++) {
       System.out.println("  " + i + ") " + this.hand.getCard(i).getName());

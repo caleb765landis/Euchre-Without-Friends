@@ -1,10 +1,12 @@
 // Euchre.java
+// main class that runs game
 
 import java.util.*;
 import java.io.*;
 
 public class Euchre {
   protected Deck deck = new Deck();
+  // used to determine which cards have been played in turn()
   protected ArrayList<Card> inPlay = new ArrayList<Card>();
   protected ArrayList<TeamMember> players = new ArrayList<TeamMember>();
   protected Player player;
@@ -15,11 +17,10 @@ public class Euchre {
   protected int oScore = 0;
   protected int pTricks = 0;
   protected int oTricks = 0;
-  protected int winPoints;
   protected String trump;
 
   public static void main(String[] args) {
-    
+
     //clears screen
     System.out.print("\033[H\033[2J");
     System.out.println("Welcome to Euchre Without Friends!");
@@ -49,7 +50,7 @@ public class Euchre {
   } // end public static void main(String[] args)
 
   public Euchre(int winPoints) {
-
+    // creates initial instances of players
     ai = new AI(deck, "ai");
     players.add(ai);
     teammate = new AI(deck, "teammate");
@@ -59,10 +60,9 @@ public class Euchre {
     player = new Player(deck, "player");
     players.add(player);
 
-
-    this.winPoints = winPoints;
     boolean winner = false;
     while (!winner) {
+      // reset for next round
       deck.setDeck();
       String lastDealer = getLastDealer();
       players.clear();
@@ -73,6 +73,7 @@ public class Euchre {
       System.out.println();
       */
 
+      // resets instances of players with new hands
       ai = new AI(deck, "ai");
       players.add(ai);
       teammate = new AI(deck, "teammate");
@@ -82,20 +83,18 @@ public class Euchre {
       player = new Player(deck, "player");
       players.add(player);
 
+      // reorganizes order of players in ArrayList
+      // rotates dealer
+      // makes sure next dealer is always last
       setDealer(lastDealer);
 
-      /* used to test setDealer()
-      System.out.println(players.get(3).getName());
-      winner += 1;
-      */
-
+      // methods to play through round
       orderTrump();
       goingAlone();
       turn();
       getWinner();
 
-
-      // check to see if there is a winner
+      // check to see if there is a winner yet
       if (this.pScore >= winPoints) {
         System.out.println("Congrats! You won!");
         winner = true;
@@ -103,11 +102,12 @@ public class Euchre {
         System.out.println("You lost :(");
         winner = true;
       } // end check winner
-
     } // end game
   } // end constructor
 
-
+  // returns last round's dealer, if any
+  // if not, sets "ai" as dealer so
+    // setDealer() rotates into player starting as dealer
   public String getLastDealer() {
     String lastDealer;
     // if last player in players isn't dealer, then game just started
@@ -160,6 +160,8 @@ public class Euchre {
   } // end setDealer()
 
   // used to finalize hands and how to decide trump
+  // goes to nameTrump() if all players pass
+  // goes to dealerDiscard() if someone orders
   public void orderTrump() {
     int randNum = (int) (Math.random() * (deck.getDeckSize()));
     Card turnedUp = deck.getCard(randNum);
@@ -182,6 +184,7 @@ public class Euchre {
         // set decision to returned string from order() from Player.java
         String decision = currentPlayer.order(turnedUp);
 
+        // moves to nameTrump()
         if (decision.equals("p")) {
           if (currentPlayer.getDealer() == true) {
             turnedOver = turnedUp.getSuit();
@@ -192,6 +195,8 @@ public class Euchre {
             numPassing += 1;
           } // end if
 
+        // sets all cards with trump to true
+        // finalizes rankings
         } else if (decision.equals("o")) {
           turnedUp.setTrump(true);
           this.trump = turnedUp.getSuit();
@@ -199,6 +204,7 @@ public class Euchre {
           // set numPassing to 4 to end while
           numPassing = 4;
 
+          // sets every card with trump in each player's hand to true
           for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 5; j++) {
               Card currentCard = currentPlayer.hand.getCard(j);
@@ -211,6 +217,7 @@ public class Euchre {
               } // end if card is same suit as turnedUp
             } // end for every card in player's hand
 
+            // gets opposite suit to determine jack ranking of suit w same color as trump
             String oppositeSuit;
             if (turnedUp.getSuit().equals("Hearts")) {
               oppositeSuit = "Diamonds";
@@ -222,6 +229,7 @@ public class Euchre {
               oppositeSuit = "Clubs";
             } // end if
 
+            // sets jack of opposite suit to second best card
             for (int k = 0; k < 5; k++) {
               Card currentCard = currentPlayer.hand.getCard(k);
               if (currentCard.getSuit().equals(oppositeSuit)) {
@@ -238,6 +246,8 @@ public class Euchre {
           dealerDiscard(turnedUp);
         } // end if pass or order
 
+      // if currentPlayer is AI
+      // same process as player
       } else {
         String decision = currentPlayer.order(turnedUp);
 
@@ -297,6 +307,9 @@ public class Euchre {
     } // end while
   } // end orderTrump()
 
+  // if all players passed in order phase, players must name which suit is trump
+  // suit of card that was turnedUp cannot be named
+  // turnedUp's suit becomes turnedOver
   public void nameTrump(String turnedOver) {
     int numPassing = 0;
 
@@ -313,8 +326,9 @@ public class Euchre {
         currentPlayer.hand.getHand();
         System.out.println();
         String decision = currentPlayer.name(turnedOver);
-        System.out.println(decision);
 
+        // if player is dealer, they must name trump
+        // same process as ordering up
         if (currentPlayer.getDealer() == true) {
           numPassing = 4;
           for (int i = 0; i < 4; i++) {
@@ -360,6 +374,8 @@ public class Euchre {
             this.trump = decision;
             currentPlayer.setTrumpDecision(true);
 
+        // if player is not dealer, they may pass if they wish
+        // the rest is same as if they were dealer
         } else {
           if (decision.equals("p")) {
             numPassing += 1;
@@ -407,7 +423,8 @@ public class Euchre {
           } // end if pass or suit
         } // end if dealer
 
-
+      // if currentPlayer is AI
+      // same process as player
       } else {
         String decision = currentPlayer.name(turnedOver);
 
@@ -501,6 +518,8 @@ public class Euchre {
     } // end while numPassing
   } // end nameTrump()
 
+  // if card is ordered up, dealer must choose a card to discard
+  // turned up card is then placed in dealer's hand
   public void dealerDiscard(Card turnedUp) {
     TeamMember currentDealer = players.get(3);
 
@@ -521,8 +540,13 @@ public class Euchre {
     } // end if player or AI
   } // end dealerDiscard()
 
-  // doesn't allow teammate to go alone
-    // because then player can't player and that's boring
+  /*
+  doesn't allow teammate to go alone
+    because then player can't play and that's boring
+  player can remove teammate's ability to play
+  risks are much higher
+  can win or lose a lot of points
+  */
   public void goingAlone() {
     for (int i = 0; i < 4; i++) {
       TeamMember currentPlayer = players.get(i);
@@ -580,6 +604,10 @@ public class Euchre {
     } // end for every player
   } // end goingAlone()
 
+  // plays through each player's hand
+  // player with best card each turn wins trick
+  // number of tricks, who chose trump, and if any players are alone
+    // decides number of points a team wins per round
   public void turn() {
     int turns = 1;
     while (turns < 6) {
@@ -609,26 +637,29 @@ public class Euchre {
           System.out.println("Your hand:");
           currentPlayer.getPlayerHand();
           System.out.println();
+
+          // gets card that player decided to play
           Card played = currentPlayer.play(currentSuit);
           inPlay.add(played);
 
-          // sets what suit players need to follow
+          // sets what suit players need to follow if player is first
           if (currentSuit.equals("none")) {
             currentSuit = played.getSuit();
           } // end if
 
         } else {
+          // gets card that AI played
           Card played = currentPlayer.play(currentSuit);
           inPlay.add(played);
 
-          // sets what suit players need to follow
+          // sets what suit players need to follow if player is first
           if (currentSuit.equals("none")) {
             currentSuit = played.getSuit();
           } // end if
         } // end if player or AI
       } // end for every player
 
-      // look for card with lowest number as rank that follow suit
+      // look for card with lowest number as rank that follows suit
       // this card wins the trick
       int bestCard = 0;
       String winner = "player";
@@ -653,11 +684,15 @@ public class Euchre {
         incOTricks();
       } // end increase tricks
 
+      // move to next turn
       inPlay.clear();
       turns += 1;
     } // end while
   } // end turn()
 
+  // gets winner of last round based on tricks,
+    // who chose trump, and if any players are alone
+  // adds points to winner's score
   public void getWinner() {
     TeamMember winner = this.player;
     int numTricks = this.pTricks;
@@ -668,7 +703,7 @@ public class Euchre {
     } // end switch winner
 
     // scoring system
-    // yes it is way too complicated
+    // yes it is way too complicated, but rules are rules
     if (winner.getTrumpDecision() == true) {
       if (winner.getAlone() == true) {
         if (numTricks == 5) {

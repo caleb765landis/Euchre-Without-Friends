@@ -1,11 +1,13 @@
 // Player.java
+// extends abstract TeamMember class
 
 import java.util.*;
 
 public class Player extends TeamMember {
 
-  public Player(){}
-
+  // constructor
+  // takes in deck as parameter so player can be dealt hand
+  // takes in name as parameter so referring to player is easier
   public Player(Deck deck, String name) {
     this.hand = new Hand();
     this.hand.dealHand(deck);
@@ -16,6 +18,8 @@ public class Player extends TeamMember {
     this.choseTrump = false;
   } // end constructor
 
+  // handles player decisions during order trump phase
+  // returns "p" or "o" for passing or ordering
   public String order(Card turnedUp) {
     boolean keepGoing = true;
     String decision = "p";
@@ -39,17 +43,21 @@ public class Player extends TeamMember {
     return decision;
   } // end order()
 
+  // handles player decisions during naming trump phase
+  // returns either "p" for passing or suit string to be set as trump
   public String name(String turnedOver) {
     boolean keepGoing = true;
     String decision = "p";
+    // ArrayList of all suits' full names
     ArrayList<String> suits = new ArrayList<String>();
     suits.add("Hearts");
     suits.add("Diamonds");
     suits.add("Clubs");
     suits.add("Spades");
 
-
-
+    // ArrayList of lowercase characters of available suits to name trump
+    // turned over suit is not allowed to be named during this phase
+      // so it is not added to arrayList
     ArrayList<Character> suitOptions = new ArrayList<Character>();
     for (int i = 0; i < suits.size(); i++) {
       if (suits.get(i) != turnedOver) {
@@ -57,13 +65,17 @@ public class Player extends TeamMember {
       }// end if
     } // end for
 
-    for (int m = 0; m < suits.size(); m++) {
-      if (suits.get(m).equals(turnedOver)) {
-        suits.remove(m);
-      }
-    }
+    // remove turned over suit from suits
+    // makes returning selected suit easier
+    for (int j = 0; j < suits.size(); j++) {
+      if (suits.get(j).equals(turnedOver)) {
+        suits.remove(j);
+      } // end if suit is turned over
+    } // end for every suit
 
     while (keepGoing) {
+      // this is called screwing the dealer
+      // dealer must name trump if nobody has done so yet
       if (this.dealer == true) {
         System.out.println("Which suit would you like to be trump?");
         System.out.print(suitOptions.get(0) + ", ");
@@ -71,9 +83,13 @@ public class Player extends TeamMember {
         System.out.print(suitOptions.get(2) + ": ");
         Scanner input = new Scanner(System.in);
         Character response = input.next().charAt(0);
+        // clears buffer?
+        input.nextLine();
 
         int checkSuit = 0;
+        // makes sure player's response is available to be selected in suits
         for (int k = 0; k < 3; k++) {
+          // if response is in suits, that suit will be named as trump
           if (response == suitOptions.get(k)) {
                 decision = suits.get(k);
           } else {
@@ -87,10 +103,13 @@ public class Player extends TeamMember {
           keepGoing = false;
         } // end if
 
+      // if player is not dealer, they may pass if they wish
+      // the rest is same as if they were dealer
       } else {
         System.out.println("Would you like to pass or name trump?");
-        System.out.println("p, "  + suitOptions.get(0) + ", ");
-        System.out.println(suitOptions.get(1) + ", ");
+        System.out.print("p, "  + suitOptions.get(0) + ", ");
+        System.out.print(suitOptions.get(1) + ", ");
+        System.out.print(suitOptions.get(2) + ": ");
         Scanner input = new Scanner(System.in);
         Character response = input.next().charAt(0);
 
@@ -118,6 +137,12 @@ public class Player extends TeamMember {
     return decision;
   } // end name()
 
+  /*
+  handles player decisions during dealer discard phase
+  dealer is always last in players ArrayList
+  removes selected card from hand
+  adds ordered up card to hand
+  */
   public void discard(Card turnedUp) {
     boolean keepGoing = true;
     while (keepGoing) {
@@ -142,6 +167,12 @@ public class Player extends TeamMember {
     } // end while
   } // end discard()
 
+  /*
+  handles player decisions during going alone phase
+  player can remove teammate's ability to play
+  risks are much higher
+  can win or lose a lot of points
+  */
   public boolean alone(String trump) {
     boolean decision = false;
     boolean keepGoing = true;
@@ -164,11 +195,14 @@ public class Player extends TeamMember {
     return decision;
   } // end alone()
 
+  // handles player decisions for each turn
+  // takes in currentSuit as parameter in order to determine what suit was led
   public Card play(String currentSuit) {
     Card played = this.hand.getCard(0);
     boolean keepGoing = true;
     while (keepGoing) {
       try {
+        // displays suit that was led, if any
         if (!(currentSuit.equals("none"))) {
           System.out.println(currentSuit + " was led.");
         } // end if
@@ -177,12 +211,14 @@ public class Player extends TeamMember {
         int response = input.nextInt();
 
         if (response < this.hand.getHandSize()) {
+          // doesn't have to follow suit because no suit was led
           if (currentSuit.equals("none")) {
             played = this.hand.getCard(response);
             this.hand.removeCard(response);
             keepGoing = false;
           } else {
             boolean hasCurrentSuit = false;
+            // checks to see if player has a suit in hand that matches led suit
             for (int i = 0; i < this.hand.getHandSize(); i++) {
               if (this.hand.getCard(i).getSuit().equals(currentSuit)) {
                 hasCurrentSuit = true;
@@ -197,7 +233,11 @@ public class Player extends TeamMember {
                 keepGoing = false;
               } else {
                 System.out.println("Selected card must follow suit.");
+                System.out.println();
               } // end if card follows suit
+
+            // if player doesn't have any of suit that was led,
+                // they can play any card
             } else {
               played = this.hand.getCard(response);
               this.hand.removeCard(response);
@@ -241,7 +281,5 @@ public class Player extends TeamMember {
     p2.setAlone(true);
     System.out.println("Alone after setAlone(true): " + p2.getAlone());
     System.out.println();
-
-    p1.name("Hearts");
   } // end public static void main(String[] args)
 } // end Player.java

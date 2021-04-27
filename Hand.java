@@ -8,8 +8,7 @@ public class Hand {
   // constructor
   public Hand() {
       hand = new ArrayList<Card>();
-    //this.dealHand(deck);
-  }
+  } // end constructor
 
   // prints out name of each card in hand
   public void getHand() {
@@ -44,15 +43,19 @@ public class Hand {
   // gets frequency of whatever card's suit is being passed
   public int getSuitFrequency(Card card) {
     String cardSuit = card.getSuit();
+    // create an array of each card in hand's suit
     ArrayList<String> handSuits = new ArrayList<String>();
     for (int i = 0; i < this.hand.size(); i++) {
       Card currentCard = this.hand.get(i);
       handSuits.add(currentCard.getSuit());
     } // end for
+    // get and return the frequency of how many times card's suit shows up in array
     int frequency = Collections.frequency(handSuits, cardSuit);
     return frequency;
   } // end getSuitFrequency()
 
+  // gets frequency of how many cards in player's hand are trump
+  // used for AI decisions 
   public int getTrumpFrequency(String trump) {
     ArrayList<String> handSuits = new ArrayList<String>();
     for (int i = 0; i < this.hand.size(); i++) {
