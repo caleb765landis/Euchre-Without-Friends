@@ -12,6 +12,12 @@ public abstract class TeamMember {
   // constructor
   public TeamMember(){}
 
+  public void getPlayerHand() {
+    for (int i = 0; i < this.hand.getHandSize(); i++) {
+      System.out.println("  " + i + ") " + this.hand.getCard(i).getName());
+    } // end for
+  } // end getPlayerHand
+
   public void setDealer(boolean dealer) {
     this.dealer = dealer;
   } // end setDealer()
@@ -34,11 +40,6 @@ public abstract class TeamMember {
 
   // abstract methods to be implemented in Player.java
   public abstract String order(Card turnedUp);
-  /*
-  public abstract void setDealer(boolean dealer);
-  public abstract boolean getDealer();
-  public abstract void setAlone(boolean alone);
-  public abstract boolean getAlone();
-  public abstract String getName();
-  */
+  public abstract String name(String turnedOver);
+  public abstract void discard(Card turnedUp);
 } // end TeamMember.java

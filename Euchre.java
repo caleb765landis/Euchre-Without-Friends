@@ -24,7 +24,7 @@ public class Euchre {
     System.out.print("\033[H\033[2J");
     System.out.println("Welcome to Euchre Without Friends!");
     boolean getPoints = true;
-    while (getPoints){
+    while (getPoints) {
       try {
         System.out.println();
         System.out.print("Would you like to play to 5 or 10 points? ");
@@ -164,6 +164,7 @@ public class Euchre {
         System.out.println("Your hand:");
         currentPlayer.hand.getHand();
         System.out.println();
+        // set decision to returned string from order() from Player.java
         String decision = currentPlayer.order(turnedUp);
 
         if (decision.equals("p")) {
@@ -216,9 +217,15 @@ public class Euchre {
               } // end if card is opposite suit
             } // end for every card in player's hand
           } // end for every player
+          this.trump = turnedUp.getSuit();
+          dealerDiscard(turnedUp);
         } // end if pass or order
+
       } else {
+        //numPassing += 1;
+
         String decision = currentPlayer.order(turnedUp);
+
         if (decision.equals("passing")) {
           if (currentPlayer.getDealer() == true) {
             turnedOver = turnedUp.getSuit();
@@ -266,24 +273,232 @@ public class Euchre {
               } // end if card is opposite suit
             } // end for every card in player's hand
           } // end for every player
+          this.trump = turnedUp.getSuit();
+          dealerDiscard(turnedUp);
         } // end if pass or order
       } // end if player or ai
     } // end while
   } // end orderTrump()
 
   public void nameTrump(String turnedOver) {
-    System.out.println(turnedOver);
+    int numPassing = 0;
+
+    while (numPassing < 4) {
+      TeamMember currentPlayer = players.get(numPassing);
+
+      if (currentPlayer.getName().equals("player")) {
+        System.out.print("\033[H\033[2J");
+        System.out.println("Naming Phase");
+        System.out.println();
+        getScores();
+        System.out.println("Turned over suit: " + turnedOver);
+        System.out.println("Your hand:");
+        currentPlayer.hand.getHand();
+        System.out.println();
+        String decision = currentPlayer.name(turnedOver);
+
+        if (currentPlayer.getDealer() == true) {
+          numPassing = 4;
+          for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 5; j++) {
+              Card currentCard = currentPlayer.hand.getCard(j);
+              if (currentCard.getSuit().equals(decision)) {
+                currentCard.setTrump(true);
+                // if currentCard is a jack of trump suit, make it best card
+                if (currentCard.getRank() == 7) {
+                  currentCard.setRank(1);
+                } // end if card is jack
+              } // end if card is same suit as turnedUp
+            } // end for every card in player's hand
+
+            String oppositeSuit;
+            if (decision.equals("Hearts")) {
+              oppositeSuit = "Diamonds";
+            } else if (decision.equals("Diamonds")) {
+              oppositeSuit = "Hearts";
+            } else if (decision.equals("Clubs")) {
+              oppositeSuit = "Spades";
+            } else {
+              oppositeSuit = "Clubs";
+            } // end if
+
+            for (int k = 0; k < 5; k++) {
+              Card currentCard = currentPlayer.hand.getCard(k);
+              if (currentCard.getSuit().equals(oppositeSuit)) {
+                // if currentCard is a jack of opposite trump suit,
+                  // make it second best card
+                if (currentCard.getRank() == 7) {
+                  currentCard.setTrump(true);
+                  currentCard.setRank(2);
+                } // end if card is jack
+              } // end if card is opposite suit
+            } // end for every card in player's hand
+          } // end for every player
+          this.trump = decision;
+
+        } else {
+          if (decision.equals("p")) {
+            numPassing += 1;
+          } else {
+            numPassing = 4;
+            for (int i = 0; i < 4; i++) {
+              for (int j = 0; j < 5; j++) {
+                Card currentCard = currentPlayer.hand.getCard(j);
+                if (currentCard.getSuit().equals(decision)) {
+                  currentCard.setTrump(true);
+                  // if currentCard is a jack of trump suit, make it best card
+                  if (currentCard.getRank() == 7) {
+                    currentCard.setRank(1);
+                  } // end if card is jack
+                } // end if card is same suit as turnedUp
+              } // end for every card in player's hand
+
+              String oppositeSuit;
+              if (decision.equals("Hearts")) {
+                oppositeSuit = "Diamonds";
+              } else if (decision.equals("Diamonds")) {
+                oppositeSuit = "Hearts";
+              } else if (decision.equals("Clubs")) {
+                oppositeSuit = "Spades";
+              } else {
+                oppositeSuit = "Clubs";
+              } // end if
+
+              for (int k = 0; k < 5; k++) {
+                Card currentCard = currentPlayer.hand.getCard(k);
+                if (currentCard.getSuit().equals(oppositeSuit)) {
+                  // if currentCard is a jack of opposite trump suit,
+                    // make it second best card
+                  if (currentCard.getRank() == 7) {
+                    currentCard.setTrump(true);
+                    currentCard.setRank(2);
+                  } // end if card is jack
+                } // end if card is opposite suit
+              } // end for every card in player's hand
+            } // end for every player
+            this.trump = decision;
+          } // end if pass or suit
+        } // end if dealer
+
+
+      } else {
+        String decision = currentPlayer.name(turnedOver);
+
+        if (currentPlayer.getDealer() == true) {
+          numPassing = 4;
+          for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 5; j++) {
+              Card currentCard = currentPlayer.hand.getCard(j);
+              if (currentCard.getSuit().equals(decision)) {
+                currentCard.setTrump(true);
+                // if currentCard is a jack of trump suit, make it best card
+                if (currentCard.getRank() == 7) {
+                  currentCard.setRank(1);
+                } // end if card is jack
+              } // end if card is same suit as turnedUp
+            } // end for every card in player's hand
+
+            String oppositeSuit;
+            if (decision.equals("Hearts")) {
+              oppositeSuit = "Diamonds";
+            } else if (decision.equals("Diamonds")) {
+              oppositeSuit = "Hearts";
+            } else if (decision.equals("Clubs")) {
+              oppositeSuit = "Spades";
+            } else {
+              oppositeSuit = "Clubs";
+            } // end if
+
+            for (int k = 0; k < 5; k++) {
+              Card currentCard = currentPlayer.hand.getCard(k);
+              if (currentCard.getSuit().equals(oppositeSuit)) {
+                // if currentCard is a jack of opposite trump suit,
+                  // make it second best card
+                if (currentCard.getRank() == 7) {
+                  currentCard.setTrump(true);
+                  currentCard.setRank(2);
+                } // end if card is jack
+              } // end if card is opposite suit
+            } // end for every card in player's hand
+          } // end for every player
+          this.trump = decision;
+
+        } else {
+          if (decision.equals("passing")) {
+            numPassing += 1;
+          } else {
+            numPassing = 4;
+            for (int i = 0; i < 4; i++) {
+              for (int j = 0; j < 5; j++) {
+                Card currentCard = currentPlayer.hand.getCard(j);
+                if (currentCard.getSuit().equals(decision)) {
+                  currentCard.setTrump(true);
+                  // if currentCard is a jack of trump suit, make it best card
+                  if (currentCard.getRank() == 7) {
+                    currentCard.setRank(1);
+                  } // end if card is jack
+                } // end if card is same suit as turnedUp
+              } // end for every card in player's hand
+
+              String oppositeSuit;
+              if (decision.equals("Hearts")) {
+                oppositeSuit = "Diamonds";
+              } else if (decision.equals("Diamonds")) {
+                oppositeSuit = "Hearts";
+              } else if (decision.equals("Clubs")) {
+                oppositeSuit = "Spades";
+              } else {
+                oppositeSuit = "Clubs";
+              } // end if
+
+              for (int k = 0; k < 5; k++) {
+                Card currentCard = currentPlayer.hand.getCard(k);
+                if (currentCard.getSuit().equals(oppositeSuit)) {
+                  // if currentCard is a jack of opposite trump suit,
+                    // make it second best card
+                  if (currentCard.getRank() == 7) {
+                    currentCard.setTrump(true);
+                    currentCard.setRank(2);
+                  } // end if card is jack
+                } // end if card is opposite suit
+              } // end for every card in player's hand
+            } // end for every player
+            this.trump = decision;
+          } // end if pass or suit
+        } // end if dealer
+      } // end if player or AI
+    } // end while numPassing
   } // end nameTrump()
+
+  public void dealerDiscard(Card turnedUp) {
+    TeamMember currentDealer = players.get(3);
+
+    if (currentDealer.getName().equals("player")) {
+      // clears screen
+      System.out.print("\033[H\033[2J");
+      System.out.println("Dealer Discarding Phase");
+      System.out.println();
+      getScores();
+      System.out.println("Trump: " + this.trump);
+      System.out.println("Turned up card: " + turnedUp.getName());
+      System.out.println("Your hand:");
+      currentDealer.getPlayerHand();
+      System.out.println();
+      currentDealer.discard(turnedUp);
+    } else {
+      currentDealer.discard(turnedUp);
+    } // end if player or AI
+  } // end dealerDiscard()
 
   // increases player's team score based on how many points were won that round
   public void incPScore(int i) {
     this.pScore += i;
-  } // end incPScore
+  } // end incPScore()
 
   // increases opponent's team score based on how many points were won that round
   public void incOScore(int i) {
     this.oScore += i;
-  } // end incOScore
+  } // end incOScore()
 
   public void getScores() {
     System.out.println("Your score: " + this.pScore);

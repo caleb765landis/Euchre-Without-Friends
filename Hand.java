@@ -13,7 +13,7 @@ public class Hand {
 
   // prints out name of each card in hand
   public void getHand() {
-    for (int i = 0; i < this.getHandSize(); i++){
+    for (int i = 0; i < this.getHandSize(); i++) {
       System.out.println("  " + this.hand.get(i).getName());
     } // end for
   } // end getHand()
