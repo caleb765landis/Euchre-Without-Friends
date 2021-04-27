@@ -11,6 +11,7 @@ public class AI extends TeamMember {
     this.dealer = false;
     this.alone = false;
     this.name = name;
+    this.choseTrump = false;
   } // end constructor
 
   public String order(Card turnedUp) {
@@ -80,11 +81,58 @@ public class AI extends TeamMember {
     return decision;
   } // end name()
 
+  // removes lowest card in deck
   public void discard(Card turnedUp) {
+    // removes last card because hand is already sorted
+      // to have lowest card be last
     this.hand.removeCard(4);
     this.hand.addCard(turnedUp);
     this.hand.sortHand();
   } // end discard()
+
+  public boolean alone(String trump) {
+    boolean decision = false;
+    int numTrump = this.hand.getTrumpFrequency(trump);
+    if (numTrump == 5) {
+      decision = true;
+    } // end if
+    return decision;
+  } // end alone()
+
+  // always plays worst card in hand because ai are dumb
+  public Card play(String currentSuit) {
+    int last = this.hand.getHandSize() - 1;
+    Card played = this.hand.getCard(last);
+    if (currentSuit.equals("none")) {
+      played = this.hand.getCard(last);
+      this.hand.removeCard(last);
+    } else {
+      boolean hasCurrentSuit = false;
+      for (int i = 0; i < this.hand.getHandSize(); i++) {
+        if (this.hand.getCard(i).getSuit().equals(currentSuit)) {
+          hasCurrentSuit = true;
+        } // end if hand has currentSuit
+      } // end for every card in hand
+
+      boolean keepGoing = true;
+      while (keepGoing) {
+        if (hasCurrentSuit == true) {
+          if (this.hand.getCard(last).getSuit().equals(currentSuit)) {
+            played = this.hand.getCard(last);
+            this.hand.removeCard(last);
+            keepGoing = false;
+          } else {
+            last -= 1;
+          } // end if last card follows suit
+        } else {
+          played = this.hand.getCard(last);
+          this.hand.removeCard(last);
+          keepGoing = false;
+        } // end if hasCurrentSuit
+      } // end while
+    } // end if currentSuit
+    return played;
+  } // end play()
 
   // tests AI class
   public static void main(String[] args) {

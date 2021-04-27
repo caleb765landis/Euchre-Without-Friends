@@ -19,7 +19,7 @@ public class Euchre {
   protected String trump;
 
   public static void main(String[] args) {
-
+    
     //clears screen
     System.out.print("\033[H\033[2J");
     System.out.println("Welcome to Euchre Without Friends!");
@@ -44,6 +44,8 @@ public class Euchre {
         System.out.println("Please enter a valid response.");
       } // end catch
     } // end while
+
+    //new Euchre(10);
   } // end public static void main(String[] args)
 
   public Euchre(int winPoints) {
@@ -59,9 +61,8 @@ public class Euchre {
 
 
     this.winPoints = winPoints;
-    //boolean winner = false;
-    int winner = 0;
-    //while (winner < 6) {
+    boolean winner = false;
+    while (!winner) {
       deck.setDeck();
       String lastDealer = getLastDealer();
       players.clear();
@@ -89,7 +90,21 @@ public class Euchre {
       */
 
       orderTrump();
-    //} // end game
+      goingAlone();
+      turn();
+      getWinner();
+
+
+      // check to see if there is a winner
+      if (this.pScore >= winPoints) {
+        System.out.println("Congrats! You won!");
+        winner = true;
+      } else if (this.oScore >= winPoints) {
+        System.out.println("You lost :(");
+        winner = true;
+      } // end check winner
+
+    } // end game
   } // end constructor
 
 
@@ -179,6 +194,8 @@ public class Euchre {
 
         } else if (decision.equals("o")) {
           turnedUp.setTrump(true);
+          this.trump = turnedUp.getSuit();
+          currentPlayer.setTrumpDecision(true);
           // set numPassing to 4 to end while
           numPassing = 4;
 
@@ -217,13 +234,11 @@ public class Euchre {
               } // end if card is opposite suit
             } // end for every card in player's hand
           } // end for every player
-          this.trump = turnedUp.getSuit();
+          //this.trump = turnedUp.getSuit();
           dealerDiscard(turnedUp);
         } // end if pass or order
 
       } else {
-        //numPassing += 1;
-
         String decision = currentPlayer.order(turnedUp);
 
         if (decision.equals("passing")) {
@@ -237,6 +252,9 @@ public class Euchre {
 
         } else {
           turnedUp.setTrump(true);
+          this.trump = turnedUp.getSuit();
+          this.ai.setTrumpDecision(true);
+          this.aitm.setTrumpDecision(true);
           numPassing = 4;
           for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 5; j++) {
@@ -273,7 +291,6 @@ public class Euchre {
               } // end if card is opposite suit
             } // end for every card in player's hand
           } // end for every player
-          this.trump = turnedUp.getSuit();
           dealerDiscard(turnedUp);
         } // end if pass or order
       } // end if player or ai
@@ -296,6 +313,7 @@ public class Euchre {
         currentPlayer.hand.getHand();
         System.out.println();
         String decision = currentPlayer.name(turnedOver);
+        System.out.println(decision);
 
         if (currentPlayer.getDealer() == true) {
           numPassing = 4;
@@ -314,12 +332,16 @@ public class Euchre {
             String oppositeSuit;
             if (decision.equals("Hearts")) {
               oppositeSuit = "Diamonds";
+              //this.trump = "Hearts";
             } else if (decision.equals("Diamonds")) {
               oppositeSuit = "Hearts";
+              //this.trump = "Diamonds";
             } else if (decision.equals("Clubs")) {
               oppositeSuit = "Spades";
+              //this.trump = "Clubs";
             } else {
               oppositeSuit = "Clubs";
+              //this.trump = "Spades";
             } // end if
 
             for (int k = 0; k < 5; k++) {
@@ -334,7 +356,9 @@ public class Euchre {
               } // end if card is opposite suit
             } // end for every card in player's hand
           } // end for every player
-          this.trump = decision;
+            player.setTrumpDecision(true);
+            this.trump = decision;
+            currentPlayer.setTrumpDecision(true);
 
         } else {
           if (decision.equals("p")) {
@@ -376,7 +400,10 @@ public class Euchre {
                 } // end if card is opposite suit
               } // end for every card in player's hand
             } // end for every player
-            this.trump = decision;
+            if (!(decision.equals("p"))){
+              this.trump = decision;
+              currentPlayer.setTrumpDecision(true);
+            } // end if
           } // end if pass or suit
         } // end if dealer
 
@@ -422,6 +449,8 @@ public class Euchre {
             } // end for every card in player's hand
           } // end for every player
           this.trump = decision;
+          this.ai.setTrumpDecision(true);
+          this.aitm.setTrumpDecision(true);
 
         } else {
           if (decision.equals("passing")) {
@@ -464,6 +493,8 @@ public class Euchre {
               } // end for every card in player's hand
             } // end for every player
             this.trump = decision;
+            this.ai.setTrumpDecision(true);
+            this.aitm.setTrumpDecision(true);
           } // end if pass or suit
         } // end if dealer
       } // end if player or AI
@@ -489,6 +520,220 @@ public class Euchre {
       currentDealer.discard(turnedUp);
     } // end if player or AI
   } // end dealerDiscard()
+
+  // doesn't allow teammate to go alone
+    // because then player can't player and that's boring
+  public void goingAlone() {
+    for (int i = 0; i < 4; i++) {
+      TeamMember currentPlayer = players.get(i);
+
+      if (currentPlayer.getName().equals("player")) {
+        System.out.print("\033[H\033[2J");
+        System.out.println("Going Alone Phase");
+        System.out.println();
+        getScores();
+        System.out.println("Trump: " + this.trump);
+        System.out.println("Your hand:");
+        currentPlayer.hand.getHand();
+        System.out.println();
+        boolean decision = currentPlayer.alone(this.trump);
+
+        if (decision == true) {
+          for (int j = 0; j < players.size(); j++) {
+            TeamMember findTeammate = players.get(j);
+            // remove teammate from ArrayList so they can't play
+            if (findTeammate.getName().equals("teammate")) {
+              players.remove(j);
+            } // end if
+          } // end search for teammate
+          this.player.setAlone(true);
+        } // end if player is going alone
+
+      } else if (currentPlayer.getName().equals("ai")) {
+        boolean decision = currentPlayer.alone(this.trump);
+        if (decision == true) {
+          for (int j = 0; j < players.size(); j++) {
+            TeamMember findTeammate = players.get(j);
+            // remove aitm from ArrayList so they can't play
+            if (findTeammate.getName().equals("aitm")) {
+              players.remove(j);
+            } // end if
+          } // end search for teammate
+          this.ai.setAlone(true);
+          this.aitm.setAlone(true);
+        } // end if player is going alone
+
+      } else if (currentPlayer.getName().equals("aitm")) {
+        boolean decision = currentPlayer.alone(this.trump);
+        if (decision == true) {
+          for (int j = 0; j < players.size(); j++) {
+            TeamMember findTeammate = players.get(j);
+            // remove ai from ArrayList so they can't play
+            if (findTeammate.getName().equals("ai")) {
+              players.remove(j);
+            } // end if
+          } // end search for teammate
+          this.ai.setAlone(true);
+          this.aitm.setAlone(true);
+        } // end if player is going alone
+      }// end if player or AI
+    } // end for every player
+  } // end goingAlone()
+
+  public void turn() {
+    int turns = 1;
+    while (turns < 6) {
+      String currentSuit = "none";
+      for (int i = 0; i < players.size(); i++) {
+        TeamMember currentPlayer = players.get(i);
+        if (currentPlayer.getName().equals("player")) {
+          System.out.print("\033[H\033[2J");
+          System.out.println("Your Turn");
+          System.out.println();
+          getScores();
+          getTricks();
+          System.out.println("Turn #" + turns);
+          System.out.println("Trump: " + this.trump);
+          System.out.println();
+
+          System.out.println("Cards in play:");
+          if (inPlay.size() == 0) {
+            System.out.println("  none");
+          } else {
+            for (int j = 0; j < inPlay.size(); j++) {
+              System.out.println("  " + players.get(j).getName() + ": " + inPlay.get(j).getName());
+            } // end for
+          } // end if cards in play
+          System.out.println();
+
+          System.out.println("Your hand:");
+          currentPlayer.getPlayerHand();
+          System.out.println();
+          Card played = currentPlayer.play(currentSuit);
+          inPlay.add(played);
+
+          // sets what suit players need to follow
+          if (currentSuit.equals("none")) {
+            currentSuit = played.getSuit();
+          } // end if
+
+        } else {
+          Card played = currentPlayer.play(currentSuit);
+          inPlay.add(played);
+
+          // sets what suit players need to follow
+          if (currentSuit.equals("none")) {
+            currentSuit = played.getSuit();
+          } // end if
+        } // end if player or AI
+      } // end for every player
+
+      // look for card with lowest number as rank that follow suit
+      // this card wins the trick
+      int bestCard = 0;
+      String winner = "player";
+      for (int k = 0; k < (inPlay.size() - 1); k++) {
+        Card currentCard = inPlay.get(k);
+        if (currentCard.getRank() < inPlay.get(k + 1).getRank()) {
+          if (currentCard.getSuit().equals(currentSuit)) {
+            bestCard = k;
+          } // end follow suit
+        } else {
+          bestCard = k + 1;
+        } // end if currentCard is best card
+      } // end check for best card
+
+      // increase tricks for winner of current turn
+      winner = players.get(bestCard).getName();
+      if (winner.equals("player")) {
+        incPTricks();
+      } else if (winner.equals("teammate")) {
+        incPTricks();
+      } else {
+        incOTricks();
+      } // end increase tricks
+
+      inPlay.clear();
+      turns += 1;
+    } // end while
+  } // end turn()
+
+  public void getWinner() {
+    TeamMember winner = this.player;
+    int numTricks = this.pTricks;
+
+    if (this.oTricks > 2) {
+      winner = this.ai;
+      numTricks = this.oTricks;
+    } // end switch winner
+
+    // scoring system
+    // yes it is way too complicated
+    if (winner.getTrumpDecision() == true) {
+      if (winner.getAlone() == true) {
+        if (numTricks == 5) {
+          if (winner == this.player) {
+            incPScore(4);
+          } else {
+            incOScore(4);
+          } // end if player or AI
+        } else {
+          if (winner == this.player) {
+            incPScore(2);
+          } else {
+            incOScore(2);
+          } // end if player or AI
+        } // end if numTricks while alone
+      } else {
+        if (numTricks == 5) {
+          if (winner == this.player) {
+            incPScore(2);
+          } else {
+            incOScore(2);
+          } // end if player or AI
+        } else {
+          if (winner == this.player) {
+            incPScore(1);
+          } else {
+            incOScore(1);
+          } // end if player or AI
+        } // end if numTricks while not alone
+      } // end if winner chosee to go alone
+    } else {
+      if (winner.getAlone() == true) {
+        if (numTricks == 5) {
+          if (winner == this.player) {
+            incPScore(5);
+          } else {
+            incOScore(5);
+          } // end if player or AI
+        } else {
+          if (winner == this.player) {
+            incPScore(4);
+          } else {
+            incOScore(4);
+          } // end if player or AI
+        } // end if numTricks while alone
+      } else {
+        if (numTricks == 5) {
+          if (winner == this.player) {
+            incPScore(4);
+          } else {
+            incOScore(4);
+          } // end if player or AI
+        } else {
+          if (winner == this.player) {
+            incPScore(2);
+          } else {
+            incOScore(2);
+          } // end if player or AI
+        } // end if numTricks while not alone
+      } // end if winner chosee to go alone
+    } // end if winner chose trump
+
+    this.pTricks = 0;
+    this.oTricks = 0;
+  } // end getWinner()
 
   // increases player's team score based on how many points were won that round
   public void incPScore(int i) {
@@ -517,7 +762,7 @@ public class Euchre {
 
   public void getTricks() {
     System.out.println("Your tricks: " + this.pTricks);
-    System.out.println("Opponenet's tricks: " + this.oTricks);
+    System.out.println("Opponent's tricks: " + this.oTricks);
   } // end getTricks()
 } // end Euchre.java
 

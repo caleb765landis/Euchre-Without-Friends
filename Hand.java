@@ -48,10 +48,20 @@ public class Hand {
     for (int i = 0; i < this.hand.size(); i++) {
       Card currentCard = this.hand.get(i);
       handSuits.add(currentCard.getSuit());
-    }
+    } // end for
     int frequency = Collections.frequency(handSuits, cardSuit);
     return frequency;
   } // end getSuitFrequency()
+
+  public int getTrumpFrequency(String trump) {
+    ArrayList<String> handSuits = new ArrayList<String>();
+    for (int i = 0; i < this.hand.size(); i++) {
+      Card currentCard = this.hand.get(i);
+      handSuits.add(currentCard.getSuit());
+    } // end for
+    int frequency = Collections.frequency(handSuits, trump);
+    return frequency;
+  } // end getTrumpFrequency
 
   /*
   get a random card in the deck

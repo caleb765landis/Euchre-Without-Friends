@@ -8,6 +8,7 @@ public abstract class TeamMember {
   protected boolean dealer;
   protected boolean alone;
   protected String name;
+  protected boolean choseTrump;
 
   // constructor
   public TeamMember(){}
@@ -38,8 +39,18 @@ public abstract class TeamMember {
     return this.name;
   } // end getName()
 
-  // abstract methods to be implemented in Player.java
+  public void setTrumpDecision(boolean decision) {
+    this.choseTrump = decision;
+  } // end setTrumpDecision()
+
+  public boolean getTrumpDecision() {
+    return this.choseTrump;
+  } // end getTrumpDecision()
+
+  // abstract methods to be implemented in Player.java and AI.java
   public abstract String order(Card turnedUp);
   public abstract String name(String turnedOver);
   public abstract void discard(Card turnedUp);
+  public abstract boolean alone(String trump);
+  public abstract Card play(String currentSuit);
 } // end TeamMember.java
